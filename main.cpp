@@ -19,9 +19,9 @@ void main()
 	camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
 
 	while (!WindowShouldClose())
-	{	
+	{
 		BeginDrawing();
-		
+
 		BeginMode3D(camera);
 
 		EndMode3D();
