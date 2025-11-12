@@ -1,30 +1,15 @@
-#include <raylib.h>
-#include <raymath.h>
-#include <iostream>
+#include "Figure.h"
+#include "raymath.h"
 
 const float cameraSpeed = 25.0f;
 
-void cameraMove(Camera3D& camera, float delta);
-Vector3 getVectorMult(Vector3 v, float mult);
-
-struct Figure
-{
-	Model model;
-	float scale;
-	Vector3 pos;
-	Color color;
-};
+void cameraMove(Camera3D& camera, bool& isCursorOn, float delta);
 
 void main()
 {
-	InitWindow(1280, 720, "Ejemplo");
+	InitWindow(1280, 720, "TP_03");
 
-	Figure cube;
-	cube.model = LoadModel("res/figures/cube.obj");
-	cube.scale = 1;
-	cube.pos = { 0,0,0 };
-	cube.color = WHITE;
-	
+	figure::Figure cube = figure::Figure("res/figures/cube.obj", 1, { 0,0,0 }, WHITE);
 
 	Vector3 origin = { 0,0,0 };
 
@@ -39,8 +24,9 @@ void main()
 	camera.fovy = 45.0f;                                // Camera field-of-view Y
 	camera.projection = CAMERA_PERSPECTIVE;             // Camera mode type
 
-	
 	DisableCursor();
+	bool isCursorOn = false;
+
 
 	float delta = 0.0f;
 
@@ -51,16 +37,16 @@ void main()
 		//Update
 		delta = GetFrameTime();
 
-		cameraMove(camera, delta);
-		//Draw
+		cameraMove(camera, isCursorOn, delta);
+		//Drawz
 		BeginDrawing();
 		BeginMode3D(camera);
 		ClearBackground(BLACK);
 
-		DrawModel(cube.model, cube.pos, cube.scale, cube.color);
+		cube.draw();
 
 		//Draw Axis
-		DrawGrid(100,5);
+		DrawGrid(100, 5);
 		DrawLine3D(origin, { 10,0,0 }, RED);
 		DrawLine3D(origin, { 0,10,0 }, GREEN);
 		DrawLine3D(origin, { 0,0,10 }, BLUE);
@@ -68,23 +54,28 @@ void main()
 		EndMode3D();
 		EndDrawing();
 	}
-	
-	UnloadModel(cube.model);
+
 	CloseWindow();
 }
 
-void cameraMove(Camera3D& camera, float delta)
+void cameraMove(Camera3D& camera, bool& isCursorOn, float delta)
 {
-	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	if (IsKeyPressed(KEY_TAB))
 	{
-		Vector3 lookingDir = Vector3Normalize(camera.target - camera.position);
+		isCursorOn = !isCursorOn;
 
-		UpdateCamera(&camera, CAMERA_FREE);
+		if (isCursorOn)
+		{
+			EnableCursor();
+		}
+		else
+		{
+			DisableCursor();
+		}
 	}
 
-}
-
-Vector3 getVectorMult(Vector3 v, float mult)
-{
-	return { v.x * mult,v.y * mult,v.z * mult };
+	if (!isCursorOn)
+	{
+		UpdateCamera(&camera, CAMERA_FREE);
+	}
 }
