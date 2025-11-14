@@ -6,6 +6,8 @@ namespace figure
 {
 	Figure::Figure(std::string modelRef, Vector3 scale, Vector3 pos, Color color, Vector3 rotationAxis, float rotationAngle, float speed, float expandSpeed) : scale(scale), pos(pos), color(color), rotationAngle(rotationAngle), speed(speed), expandSpeed(speed), isSelected(false)
 	{
+		maxVertices = 0;
+
 		model = LoadModel(modelRef.c_str());
 
 		translateM = MatrixTranslate(pos.x, pos.y, pos.z);
@@ -54,6 +56,7 @@ namespace figure
 			vertex = Vector3Transform(vertex, model.transform);
 
 			vertices.push_back(vertex);
+			maxVertices++;
 		}
 	}
 
@@ -80,7 +83,7 @@ namespace figure
 		Vector3 min = { INT_MAX,INT_MAX,INT_MAX };
 		Vector3 max = { INT_MIN,INT_MIN,INT_MIN };
 
-		for (int i = 0; i < model.meshes[0].vertexCount / 3; i++)
+		for (int i = 0; i < maxVertices; i++)
 		{
 			min.x = fminf(min.x, vertices[i].x);
 			min.y = fminf(min.y, vertices[i].y);
@@ -120,7 +123,7 @@ namespace figure
 		boundingBox.draw();
 	}
 
-	void Figure::rotate(float delta)
+	void Figure::modifyTrsValues(float delta)
 	{
 		if (isSelected)
 		{
@@ -170,19 +173,19 @@ namespace figure
 
 				if (IsKeyDown(KEY_W))
 				{
-					dir.z = 1;
+					dir.z = -1;
 				}
 				if (IsKeyDown(KEY_A))
 				{
-					dir.x = 1;
+					dir.x = -1;
 				}
 				if (IsKeyDown(KEY_S))
 				{
-					dir.z = -1;
+					dir.z = 1;
 				}
 				if (IsKeyDown(KEY_D))
 				{
-					dir.x = -1;
+					dir.x = 1;
 				}
 				if (IsKeyDown(KEY_Q))
 				{

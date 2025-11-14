@@ -33,6 +33,7 @@ namespace figure
 		boundingBox::BoundingBox boundingBox;
 
 		std::vector<Vector3> vertices;
+		int maxVertices;
 
 	public:
 		Figure(std::string modelRef, Vector3 scale, Vector3 pos, Color color, Vector3 rotationAxis, float rotationAngle, float speed, float expandSpeed);
@@ -48,7 +49,7 @@ namespace figure
 		bool getIsSelected();
 
 		void draw();
-		void rotate(float delta);
+		void modifyTrsValues(float delta);
 	};
 }
 
