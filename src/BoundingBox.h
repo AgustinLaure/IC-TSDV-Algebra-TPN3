@@ -1,7 +1,11 @@
 #pragma once
 
+#include <vector>
+
 #include "raylib.h"
 #include "raymath.h"
+
+#include "Plane.h"
 
 namespace boundingBox
 {
@@ -13,10 +17,19 @@ namespace boundingBox
 
 		Color color;
 
+		Vector3 vertices[8];
+		int maxVertices;
+
+		std::vector<plane::Plane> planes;
+		int maxPlanes;
+
 		BoundingBox();
-		BoundingBox(Vector3 min, Vector3 max);
 		~BoundingBox();
 
+		void init(std::vector <Vector3>& figureVertices, int figureMaxVert);
+		void setPlanes();
+		void updateValues(std::vector <Vector3>& figureVertices, int figureMaxVert);
+		bool isPointCol(Vector3 point);
 		void draw();
 	};
 }

@@ -19,6 +19,7 @@ namespace figure
 		isRotating = false;
 		isTranslating = false;
 		isScaling = false;
+		isCollidingBoundingBox = false;
 	}
 	Figure::~Figure()
 	{
@@ -30,7 +31,7 @@ namespace figure
 		model.transform = MatrixMultiply(MatrixMultiply(scaleM, rotationM), translateM);
 
 		initVertices();
-		updateBoundingBox();
+		boundingBox.init(vertices, maxVertices);
 	}
 
 	void Figure::updatePositions()
@@ -38,7 +39,7 @@ namespace figure
 		model.transform = MatrixMultiply(MatrixMultiply(scaleM, rotationM), translateM);
 
 		updateVertices();
-		updateBoundingBox();
+		boundingBox.updateValues(vertices, maxVertices);
 	}
 
 	void Figure::initVertices()
@@ -78,24 +79,27 @@ namespace figure
 		}
 	}
 
-	void Figure::updateBoundingBox()
+	void Figure::update(std::vector<Figure*>figures, int maxFigures)
 	{
-		Vector3 min = { INT_MAX,INT_MAX,INT_MAX };
-		Vector3 max = { INT_MIN,INT_MIN,INT_MIN };
-
-		for (int i = 0; i < maxVertices; i++)
+		for (int i = 0; i < maxFigures; i++)
 		{
-			min.x = fminf(min.x, vertices[i].x);
-			min.y = fminf(min.y, vertices[i].y);
-			min.z = fminf(min.z, vertices[i].z);
+			Figure* current = figures[i];
+			
+			if (current == this)
+			{
+				continue;
+			}
 
-			max.x = fmaxf(max.x, vertices[i].x);
-			max.y = fmaxf(max.y, vertices[i].y);
-			max.z = fmaxf(max.z, vertices[i].z);
+			for (int j = 0; j < current->boundingBox.maxVertices; j++)
+			{
+				isCollidingBoundingBox = false;
+				if (boundingBox.isPointCol(current->boundingBox.vertices[j]))
+				{
+					isCollidingBoundingBox = true;
+					std::cout << "Tocandoo";
+				}
+			}
 		}
-
-		boundingBox.min = min;
-		boundingBox.max = max;
 	}
 
 	void Figure::select()
@@ -121,6 +125,11 @@ namespace figure
 			DrawPoint3D(vertices[i], GREEN);
 		}
 		boundingBox.draw();
+
+		for (int i = 0; i < boundingBox.planes.size(); i++)
+		{
+			DrawLine3D(boundingBox.planes[i].norm, boundingBox.planes[i].pos, RED);
+		}
 	}
 
 	void Figure::modifyTrsValues(float delta)

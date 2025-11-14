@@ -8,7 +8,7 @@ const float cameraSpeed = 25.0f;
 
 void cameraMove(Camera3D& camera, bool& isCursorOn, float delta);
 void drawWorldLines(Vector3 origin);
-void figuresUpdate(std::vector<figure::Figure*> figures, bool isCursorOn, float delta);
+void figuresUpdate(std::vector<figure::Figure*> figures, int maxFigures, bool isCursorOn, float delta);
 void figuresDraw(std::vector<figure::Figure*> figures);
 void deinitFigures(std::vector<figure::Figure*> figures);
 
@@ -17,19 +17,31 @@ void main()
 	InitWindow(1280, 720, "TP_03");
 
 	std::vector<figure::Figure*> figures;
+	int maxFigures = 0;
 	
-	figure::Figure* cube = new figure::Figure("res/figures/cube.obj", {2,2,2}, {5,0,0}, WHITE, {0,0,0}, 0.05f * RAD2DEG, 10.0f, 0.0005f);
+	figure::Figure* cube = new figure::Figure("res/figures/cube.obj", {2,2,2}, {1,0,0}, WHITE, {0,0,0}, 0.05f * RAD2DEG, 10.0f, 0.0005f);
 	figures.push_back(cube);
-	figure::Figure* deca = new figure::Figure("res/figures/decahedron.obj", { 2,2,2 }, { 6,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	figures.push_back(deca);
-	figure::Figure* dode = new figure::Figure("res/figures/dodecahedron.obj", { 2,2,2 }, { 12,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	figures.push_back(dode);
-	figure::Figure* ico = new figure::Figure("res/figures/icosahedron.obj", { 2,2,2 }, {18,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	figures.push_back(ico);
-	figure::Figure* octa = new figure::Figure("res/figures/octahedron.obj", { 2,2,2 }, { 24,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	figures.push_back(octa);
-	figure::Figure* tetra = new figure::Figure("res/figures/tetrahedron.obj", { 2,2,2 }, { 30,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	figures.push_back(tetra);
+	maxFigures++;
+
+	//figure::Figure* deca = new figure::Figure("res/figures/decahedron.obj", { 2,2,2 }, { 6,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
+	//figures.push_back(deca);
+	//maxFigures++;
+	//
+	//figure::Figure* dode = new figure::Figure("res/figures/dodecahedron.obj", { 2,2,2 }, { 12,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
+	//figures.push_back(dode);
+	//maxFigures++;
+	//
+	//figure::Figure* ico = new figure::Figure("res/figures/icosahedron.obj", { 2,2,2 }, {18,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
+	//figures.push_back(ico);
+	//maxFigures++;
+	//
+	//figure::Figure* octa = new figure::Figure("res/figures/octahedron.obj", { 2,2,2 }, { 24,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
+	//figures.push_back(octa);
+	//maxFigures++;
+	//
+	//figure::Figure* tetra = new figure::Figure("res/figures/tetrahedron.obj", { 2,2,2 }, { 30,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
+	//figures.push_back(tetra);
+	//maxFigures++;
 
 	Vector3 origin = { 0,0,0 };
 	Camera3D camera = { 0 };
@@ -50,7 +62,7 @@ void main()
 	{
 		//Update
 		delta = GetFrameTime();
-		figuresUpdate(figures, isCursorOn, delta);
+		figuresUpdate(figures, maxFigures, isCursorOn, delta);
 		cameraMove(camera, isCursorOn, delta);
 
 		//
@@ -102,7 +114,7 @@ void drawWorldLines(Vector3 origin)
 	DrawLine3D(origin, { 0,0,10 }, BLUE);
 }
 
-void figuresUpdate(std::vector<figure::Figure*> figures, bool isCursorOn, float delta)
+void figuresUpdate(std::vector<figure::Figure*> figures, int maxFigures, bool isCursorOn, float delta)
 {
 	if (IsKeyPressed(KEY_ONE))
 	{
@@ -176,9 +188,14 @@ void figuresUpdate(std::vector<figure::Figure*> figures, bool isCursorOn, float 
 		}
 	}
 
-	for (int i = 0; i < figures.size(); i++)
+	for (int i = 0; i < maxFigures; i++)
 	{
 		figures[i]->modifyTrsValues(delta);
+	}
+
+	for (int i = 0; i < maxFigures; i++)
+	{
+		figures[i]->update(figures, maxFigures);
 	}
 }
 

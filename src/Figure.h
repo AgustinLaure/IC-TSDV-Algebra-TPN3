@@ -31,6 +31,7 @@ namespace figure
 		bool isScaling;
 
 		boundingBox::BoundingBox boundingBox;
+		bool isCollidingBoundingBox;
 
 		std::vector<Vector3> vertices;
 		int maxVertices;
@@ -43,7 +44,7 @@ namespace figure
 		void initVertices();
 		void updatePositions();
 		void updateVertices();
-		void updateBoundingBox();
+		void update(std::vector<Figure*>figures, int maxFigures);
 		void select();
 		void deselect();
 		bool getIsSelected();
