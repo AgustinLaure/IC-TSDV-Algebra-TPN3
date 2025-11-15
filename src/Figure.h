@@ -30,21 +30,30 @@ namespace figure
 		bool isTranslating;
 		bool isScaling;
 
-		boundingBox::BoundingBox boundingBox;
-		bool isCollidingBoundingBox;
-
 		std::vector<Vector3> vertices;
 		int maxVertices;
 
 	public:
-		Figure(std::string modelRef, Vector3 scale, Vector3 pos, Color color, Vector3 rotationAxis, float rotationAngle, float speed, float expandSpeed);
+		std::string name;
+
+		bool isCollidingFigure;
+
+		boundingBox::BoundingBox boundingBox;
+		bool isCollidingBoundingBox;
+
+		std::vector<plane::Plane> planes;
+		int maxPlanes;
+
+		Figure(std::string name, std::string modelRef, Vector3 scale, Vector3 pos, Color color, Vector3 rotationAxis, float rotationAngle, float speed, float expandSpeed);
 		~Figure();
 
 		void initPositions();
 		void initVertices();
+		void setPlanes();
 		void updatePositions();
 		void updateVertices();
-		void update(std::vector<Figure*>figures, int maxFigures);
+		void updatePlanes();
+		bool isPointCol(Vector3 point);
 		void select();
 		void deselect();
 		bool getIsSelected();

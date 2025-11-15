@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "raymath.h"
+#include "Grid.h"
 
 const float cameraSpeed = 25.0f;
 
@@ -14,38 +14,42 @@ void deinitFigures(std::vector<figure::Figure*> figures);
 
 void main()
 {
+	const int distBetweenText = 75;
+
 	InitWindow(1280, 720, "TP_03");
+
+	grid::Grid* grid = new grid::Grid();
 
 	std::vector<figure::Figure*> figures;
 	int maxFigures = 0;
-	
-	figure::Figure* cube = new figure::Figure("res/figures/cube.obj", {2,2,2}, {1,0,0}, WHITE, {0,0,0}, 0.05f * RAD2DEG, 10.0f, 0.0005f);
+
+	figure::Figure* cube = new figure::Figure("Cube", "res/figures/cube.obj", { 1,1,1 }, { 0,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 3.0f, 0.0005f);
 	figures.push_back(cube);
 	maxFigures++;
 
-	//figure::Figure* deca = new figure::Figure("res/figures/decahedron.obj", { 2,2,2 }, { 6,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	//figures.push_back(deca);
-	//maxFigures++;
-	//
-	//figure::Figure* dode = new figure::Figure("res/figures/dodecahedron.obj", { 2,2,2 }, { 12,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	//figures.push_back(dode);
-	//maxFigures++;
-	//
-	//figure::Figure* ico = new figure::Figure("res/figures/icosahedron.obj", { 2,2,2 }, {18,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	//figures.push_back(ico);
-	//maxFigures++;
-	//
-	//figure::Figure* octa = new figure::Figure("res/figures/octahedron.obj", { 2,2,2 }, { 24,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	//figures.push_back(octa);
-	//maxFigures++;
-	//
-	//figure::Figure* tetra = new figure::Figure("res/figures/tetrahedron.obj", { 2,2,2 }, { 30,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 10.0f, 0.0005f);
-	//figures.push_back(tetra);
-	//maxFigures++;
+	figure::Figure* deca = new figure::Figure("Deca", "res/figures/decahedron.obj", { 1,1,1 }, { 3,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 3.0f, 0.0005f);
+	figures.push_back(deca);
+	maxFigures++;
+
+	figure::Figure* dode = new figure::Figure("Dode", "res/figures/dodecahedron.obj", { 1,1,1 }, { 5,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 3.0f, 0.0005f);
+	figures.push_back(dode);
+	maxFigures++;
+
+	figure::Figure* ico = new figure::Figure("Ico", "res/figures/icosahedron.obj", { 1,1,1 }, { -3,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 3.0f, 0.0005f);
+	figures.push_back(ico);
+	maxFigures++;
+
+	figure::Figure* octa = new figure::Figure("Octa", "res/figures/octahedron.obj", { 1,1,1 }, { -5,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 3.0f, 0.0005f);
+	figures.push_back(octa);
+	maxFigures++;
+
+	figure::Figure* tetra = new figure::Figure("Tetra", "res/figures/tetrahedron.obj", { 1,1,1 }, { -7,0,0 }, WHITE, { 0,0,0 }, 0.05f * RAD2DEG, 3.0f, 0.0005f);
+	figures.push_back(tetra);
+	maxFigures++;
 
 	Vector3 origin = { 0,0,0 };
 	Camera3D camera = { 0 };
-	const float cameraDistance = 20.0f;
+	const float cameraDistance = 5.0f;
 	const float rotationAngle = 0.05f;
 	camera.position = { cameraDistance, cameraDistance, cameraDistance };  // Camera position
 	camera.target = origin;						// Camera looking at point
@@ -64,22 +68,51 @@ void main()
 		delta = GetFrameTime();
 		figuresUpdate(figures, maxFigures, isCursorOn, delta);
 		cameraMove(camera, isCursorOn, delta);
+		grid->update(figures, maxFigures);
 
 		//
-		
+
 		//Draw
 		BeginDrawing();
 		BeginMode3D(camera);
 		ClearBackground(BLACK);
 
+		grid->draw();
 		drawWorldLines(origin);
 		figuresDraw(figures);
-		
+
 		EndMode3D();
+
+		for (int i = 0; i < maxFigures; i++)
+		{
+			std::string text1 = figures[i]->name + ": ";
+			std::string text2 = "isCollidingBoundingBox";
+			Color text2Color = RED;
+			if (figures[i]->isCollidingBoundingBox)
+			{
+				text2Color = GREEN;
+			}
+
+			std::string text3 = "isCollidingFigure";
+			Color text3Color = RED;
+			if (figures[i]->isCollidingFigure)
+			{
+				text3Color = GREEN;
+			}
+
+			DrawText(text1.c_str(), 40, distBetweenText * i + 30, 25, WHITE);
+			DrawText(text2.c_str(), 125, distBetweenText * i + 30, 20, text2Color);
+			DrawText(text3.c_str(), 125,distBetweenText * i + 52, 20, text3Color);
+
+		}
+
 		EndDrawing();
 	}
 
 	deinitFigures(figures);
+
+	delete grid;
+	grid = nullptr;
 
 	CloseWindow();
 }
@@ -191,11 +224,6 @@ void figuresUpdate(std::vector<figure::Figure*> figures, int maxFigures, bool is
 	for (int i = 0; i < maxFigures; i++)
 	{
 		figures[i]->modifyTrsValues(delta);
-	}
-
-	for (int i = 0; i < maxFigures; i++)
-	{
-		figures[i]->update(figures, maxFigures);
 	}
 }
 

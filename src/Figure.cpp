@@ -4,7 +4,7 @@
 
 namespace figure
 {
-	Figure::Figure(std::string modelRef, Vector3 scale, Vector3 pos, Color color, Vector3 rotationAxis, float rotationAngle, float speed, float expandSpeed) : scale(scale), pos(pos), color(color), rotationAngle(rotationAngle), speed(speed), expandSpeed(speed), isSelected(false)
+	Figure::Figure(std::string name, std::string modelRef, Vector3 scale, Vector3 pos, Color color, Vector3 rotationAxis, float rotationAngle, float speed, float expandSpeed) : name(name), scale(scale), pos(pos), color(color), rotationAngle(rotationAngle), speed(speed), expandSpeed(speed), isSelected(false)
 	{
 		maxVertices = 0;
 
@@ -32,6 +32,7 @@ namespace figure
 
 		initVertices();
 		boundingBox.init(vertices, maxVertices);
+		setPlanes();
 	}
 
 	void Figure::updatePositions()
@@ -40,6 +41,7 @@ namespace figure
 
 		updateVertices();
 		boundingBox.updateValues(vertices, maxVertices);
+		updatePlanes();
 	}
 
 	void Figure::initVertices()
@@ -61,6 +63,24 @@ namespace figure
 		}
 	}
 
+	void Figure::setPlanes()
+	{
+		for (int i = 0; i < model.meshes[0].triangleCount; i++)
+		{
+			plane::Plane auxPlane = plane::Plane(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+
+			//Vector3 center = pos - auxPlane.pos;
+			//
+			//if (Vector3DotProduct(auxPlane.norm, center) < 0)
+			//{
+			//	auxPlane.norm *= -1;
+			//}
+
+			planes.push_back(auxPlane);
+			maxPlanes++;
+		}
+	}
+
 	void Figure::updateVertices()
 	{
 		Vector3 vertex = { 0.0f,0.0f,0.0f };
@@ -79,27 +99,41 @@ namespace figure
 		}
 	}
 
-	void Figure::update(std::vector<Figure*>figures, int maxFigures)
+	void Figure::updatePlanes()
 	{
-		for (int i = 0; i < maxFigures; i++)
+		for (int i = 0; i < model.meshes[0].triangleCount; i++)
 		{
-			Figure* current = figures[i];
-			
-			if (current == this)
-			{
-				continue;
-			}
+			plane::Plane auxPlane = plane::Plane(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
 
-			for (int j = 0; j < current->boundingBox.maxVertices; j++)
+			//Vector3 center = Vector3Transform(pos, translateM) - auxPlane.pos;
+			//
+			//if (Vector3DotProduct(auxPlane.norm, center) < 0)
+			//{
+			//	auxPlane.norm *= -1;
+			//}
+
+			planes[i] = auxPlane;
+		}
+	}
+
+	bool Figure::isPointCol(Vector3 point)
+	{
+		bool isInside = true;
+
+		for (int i = 0; i < maxPlanes; i++)
+		{
+			isInside = true;
+
+			Vector3 diff = point - planes[i].pos;
+
+			if (Vector3DotProduct(diff, planes[i].norm) < 0)
 			{
-				isCollidingBoundingBox = false;
-				if (boundingBox.isPointCol(current->boundingBox.vertices[j]))
-				{
-					isCollidingBoundingBox = true;
-					std::cout << "Tocandoo";
-				}
+				isInside = false;
+				break;
 			}
 		}
+
+		return isInside;
 	}
 
 	void Figure::select()
@@ -120,16 +154,40 @@ namespace figure
 	{
 		DrawModel(model, { 0.0f,0.0f,0.f }, 1, color);
 
-		for (int i = 0; i < vertices.size(); i++)
-		{
-			DrawPoint3D(vertices[i], GREEN);
-		}
 		boundingBox.draw();
+
+		//DrawTriangle3D(boundingBox.vertices[0], boundingBox.vertices[1], boundingBox.vertices[2], GREEN);
+		//
+		//DrawLine3D(boundingBox.planes[0].pos, boundingBox.planes[0].pos + Vector3Scale(boundingBox.planes[0].norm, 1.0f), RED);
+		//DrawLine3D(boundingBox.planes[1].pos, boundingBox.planes[1].pos + Vector3Scale(boundingBox.planes[1].norm, 1.0f), RED);
+		//
+		//DrawLine3D(boundingBox.planes[2].pos, boundingBox.planes[2].pos + Vector3Scale(boundingBox.planes[2].norm, 1.0f), RED);
+		//DrawLine3D(boundingBox.planes[3].pos, boundingBox.planes[3].pos + Vector3Scale(boundingBox.planes[3].norm, 1.0f), RED);
+		//
+		//DrawLine3D(boundingBox.planes[4].pos, boundingBox.planes[4].pos + Vector3Scale(boundingBox.planes[4].norm, 1.0f), RED);
+		//DrawLine3D(boundingBox.planes[5].pos, boundingBox.planes[5].pos + Vector3Scale(boundingBox.planes[5].norm, 1.0f), RED);
+		//
+		//DrawLine3D(boundingBox.planes[6].pos, boundingBox.planes[6].pos + Vector3Scale(boundingBox.planes[6].norm, 1.0f), RED);
+		//DrawLine3D(boundingBox.planes[7].pos, boundingBox.planes[7].pos + Vector3Scale(boundingBox.planes[7].norm, 1.0f), RED);
+		//
+		//DrawLine3D(boundingBox.planes[8].pos, boundingBox.planes[8].pos + Vector3Scale(boundingBox.planes[8].norm, 1.0f), RED);
+		//DrawLine3D(boundingBox.planes[9].pos, boundingBox.planes[9].pos + Vector3Scale(boundingBox.planes[9].norm, 1.0f), RED);
+		//
+		//DrawLine3D(boundingBox.planes[10].pos, boundingBox.planes[10].pos + Vector3Scale(boundingBox.planes[10].norm, 1.0f), RED);
+		//DrawLine3D(boundingBox.planes[11].pos, boundingBox.planes[11].pos + Vector3Scale(boundingBox.planes[11].norm, 1.0f), RED);
+
+		for (int i = 0; i < maxPlanes; i++)
+		{
+			DrawLine3D(planes[i].pos, planes[i].pos + Vector3Scale(planes[i].norm, 1.0f), RED);
+		}
+
 
 		for (int i = 0; i < boundingBox.planes.size(); i++)
 		{
-			DrawLine3D(boundingBox.planes[i].norm, boundingBox.planes[i].pos, RED);
+			//DrawLine3D(boundingBox.planes[i].pos, boundingBox.planes[i].pos + Vector3Scale(boundingBox.planes[i].norm, 1.0f), RED);
 		}
+
+		DrawLine3D(pos, { 0.0f,0.0f,0.0f }, BROWN);
 	}
 
 	void Figure::modifyTrsValues(float delta)

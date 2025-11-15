@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClCompile Include="src\BoundingBox.cpp" />
     <ClCompile Include="src\Figure.cpp" />
+    <ClCompile Include="src\Grid.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Plane.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BoundingBox.h" />
     <ClInclude Include="src\Figure.h" />
+    <ClInclude Include="src\Grid.h" />
     <ClInclude Include="src\Plane.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

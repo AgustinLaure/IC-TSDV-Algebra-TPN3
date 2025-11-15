@@ -28,6 +28,7 @@ namespace boundingBox
 
 		void init(std::vector <Vector3>& figureVertices, int figureMaxVert);
 		void setPlanes();
+		void updatePlanes();
 		void updateValues(std::vector <Vector3>& figureVertices, int figureMaxVert);
 		bool isPointCol(Vector3 point);
 		void draw();
